@@ -40,7 +40,7 @@
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
-    <ConfigurationType>Application</ConfigurationType>
+    <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v143</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
@@ -138,9 +138,7 @@
     <ClCompile Include="DGE\utils.cpp" />
     <ClCompile Include="lib\glad.c" />
     <ClCompile Include="lib\stb_image.cpp" />
-    <ClCompile Include="Test\app.cpp" />
-    <ClCompile Include="Test\main.cpp" />
-    <ClCompile Include="Test\sandbox.cpp" />
+    <ClCompile Include="DGE\core\app.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="DGE\core\file.h" />
@@ -152,8 +150,7 @@
     <ClInclude Include="DGE\DGGL\texture.h" />
     <ClInclude Include="DGE\utils.h" />
     <ClInclude Include="lib_include\stb_image.h" />
-    <ClInclude Include="Test\app.h" />
-    <ClInclude Include="Test\sandbox.h" />
+    <ClInclude Include="DGE\core\app.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="shader\triangle.frag" />

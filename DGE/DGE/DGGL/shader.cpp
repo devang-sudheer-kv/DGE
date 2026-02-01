@@ -1,7 +1,8 @@
 #include "shader.h"
 #include "core/log.h"
+#include "glm/glm.hpp"
 
-Shader::Shader() : m_ID(0)
+Shader::Shader() : Id_(0)
 { }
 
 void Shader::compile(const char* vs, const char* fs)
@@ -32,20 +33,20 @@ void Shader::compile(const char* vs, const char* fs)
         MSG("ERROR COMPILING FRAGMENT SHADER " << infoLog1);
     }
 
+
+    Id_ = glCreateProgram();
+    glAttachShader(Id_, vert);
+    glAttachShader(Id_, frag);
+    glLinkProgram(Id_);
     int linkSuccess;
     char linkLog[512] = {};
-    glGetProgramiv(m_ID, GL_LINK_STATUS, &linkSuccess);
+    glGetProgramiv(Id_, GL_LINK_STATUS, &linkSuccess);
     if (!linkSuccess)
     {
-        glGetProgramInfoLog(m_ID, 512, NULL, linkLog);
+        glGetProgramInfoLog(Id_, 512, NULL, linkLog);
         MSG("ERROR LINKING" << linkLog);
     }
-
-    m_ID = glCreateProgram();
-    glAttachShader(m_ID, vert);
-    glAttachShader(m_ID, frag);
-    glLinkProgram(m_ID);
-    glUseProgram(m_ID);
+    glUseProgram(Id_);
     glDeleteShader(vert);
     glDeleteShader(frag);
     glUseProgram(0);
@@ -53,16 +54,22 @@ void Shader::compile(const char* vs, const char* fs)
 
 void Shader::use()
 {
-    glUseProgram(m_ID);
+    //MSG_DBG(Id_);
+    glUseProgram(Id_);
 }
 
 void Shader::clean()
 {
     glUseProgram(0);
-    glDeleteProgram(m_ID);
+    glDeleteProgram(Id_);
 }
 
 void Shader::setFloat(const std::string& name, float value) const
 {
-    glUniform1f(glGetUniformLocation(m_ID, name.c_str()), value);
+    glUniform1f(glGetUniformLocation(Id_, name.c_str()), value);
+}
+
+void Shader::setMat4(const std::string& name, glm::mat4 value) const
+{
+    glUniformMatrix4fv(glGetUniformLocation(Id_, name.c_str()) , 1, GL_FALSE, glm::value_ptr(value));
 }
