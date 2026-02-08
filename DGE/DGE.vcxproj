@@ -130,9 +130,8 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="DGE\core\file.cpp" />
-    <ClCompile Include="DGE\core\layer.cpp" />
     <ClCompile Include="DGE\core\log.cpp" />
-    <ClCompile Include="DGE\DGGL\renderer.cpp" />
+    <ClCompile Include="DGE\renderer\renderer.cpp" />
     <ClCompile Include="DGE\DGGL\shader.cpp" />
     <ClCompile Include="DGE\DGGL\texture.cpp" />
     <ClCompile Include="DGE\utils.cpp" />
@@ -142,10 +141,13 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="DGE\core\file.h" />
+    <ClInclude Include="DGE\core\input.h" />
     <ClInclude Include="DGE\core\layer.h" />
     <ClInclude Include="DGE\core\log.h" />
     <ClInclude Include="DGE\dge.h" />
-    <ClInclude Include="DGE\DGGL\renderer.h" />
+    <ClInclude Include="DGE\core\event.h" />
+    <ClInclude Include="DGE\renderer\camera.h" />
+    <ClInclude Include="DGE\renderer\renderer.h" />
     <ClInclude Include="DGE\DGGL\shader.h" />
     <ClInclude Include="DGE\DGGL\texture.h" />
     <ClInclude Include="DGE\utils.h" />

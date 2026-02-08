@@ -3,6 +3,7 @@
 #include "glm/gtc/matrix_transform.hpp"
 #include "glm/gtc/type_ptr.hpp"
 #include "core/file.h"
+#include "core/log.h"
 
 namespace DGE
 {
@@ -80,19 +81,22 @@ namespace DGE
 
 		std::vector<AttribInfo> rectInstanceAttribs;
 		rectInstanceAttribs.emplace_back(1, 4, GL_FLOAT);
-		rectInstanceAttribs.emplace_back(2, 4, GL_UNSIGNED_BYTE, GL_TRUE);
+		rectInstanceAttribs.emplace_back(2, 1, GL_FLOAT);
+		rectInstanceAttribs.emplace_back(3, 4, GL_UNSIGNED_BYTE, GL_TRUE);
 		configAttribs(rectInstanceVBO, rectVAO, rectInstanceAttribs);
+
 		glVertexAttribDivisor(1, 1);
 		glVertexAttribDivisor(2, 1);
+		glVertexAttribDivisor(3, 1);
 
 		const char* vert_source = R"(
 #version 330 core
 
 layout (location = 0) in vec2 aPos;
 layout (location = 1) in vec4 aTransform;
-layout (location = 2) in vec4 aCol;
+layout (location = 2) in float iRot;
+layout (location = 3) in vec4 aCol;
 
-uniform mat4 view;
 uniform mat4 projection;
 
 out vec4 col;
@@ -100,7 +104,21 @@ out vec4 col;
 void main()
 {
 	col = aCol;
-	gl_Position = projection * vec4(aPos * aTransform.zw + aTransform.xy, 0.0f, 1.0);
+
+    vec2 local = aPos * aTransform.zw;
+    float s = sin(iRot);
+    float c = cos(iRot);
+
+    mat2 rot = mat2(
+        c, -s,
+        s,  c
+    );
+
+    local = rot * local;
+    vec2 world = local + aTransform.xy;
+
+
+	gl_Position = projection * vec4(world, 0.0f, 1.0);
 }
 )";
 		const char* frag_source = R"(
@@ -115,10 +133,12 @@ void main()
 }
 )";
 		defaultRectShader.compile(vert_source, frag_source);
+	}
 
-		projection = glm::ortho(-200.0f, 200.0f, -200.0f, 200.0f, -1.0f, 100.0f);
-		defaultRectShader.use();
-		defaultRectShader.setMat4("projection", projection);
+	void Renderer2D::clear()
+	{
+		glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
+		glClear(GL_COLOR_BUFFER_BIT);
 	}
 
 	void Renderer2D::beginBatch()
@@ -126,14 +146,23 @@ void main()
 		rectRenderBuffer.clear();
 	}
 
-	void Renderer2D::addRect(float x, float y, float w, float h, uint8_t r, uint8_t g, uint8_t b, uint8_t a)
+	void Renderer2D::addRect(float x, float y, float w, float h, float rot, uint8_t r, uint8_t g, uint8_t b, uint8_t a)
 	{
-		rectRenderBuffer.emplace_back(x, y, w, h, r, g, b, a);
+		rectRenderBuffer.emplace_back(x, y, w, h, rot, r, g, b, a);
 	}
 
 	void Renderer2D::renderBatch()
 	{
 		defaultRectShader.use();
+		if (cam_.has_value())
+		{
+			defaultRectShader.setMat4("projection", (*cam_)->getTransform());
+		}
+		else
+		{
+			defaultRectShader.setMat4("projection", glm::mat4(1.f));
+			MSG_DBG("WARNING: RENDERING WITHOUT CAMERA");
+		}
 		glBindVertexArray(rectVAO);
 		glBindBuffer(GL_ARRAY_BUFFER, rectInstanceVBO);
 		glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(Rect) * rectRenderBuffer.size(), rectRenderBuffer.data());

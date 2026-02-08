@@ -16,10 +16,12 @@ namespace DGE {
 		void run();
 		void terminate();
 		void attachLayer(Layer* layer);
+		void onEvent(Event& e);
+		static GLFWwindow* getWindow() { return window; };
 
 
 	private:
-		GLFWwindow* window;
+		static GLFWwindow* window;
 		std::vector<Layer*> m_layerStack;
 		void update();
 	};
